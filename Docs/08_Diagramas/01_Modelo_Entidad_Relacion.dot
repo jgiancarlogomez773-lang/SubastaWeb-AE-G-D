@@ -1,0 +1,23 @@
+// Modelo entidad relacion SubastaWeb
+digraph {
+	bgcolor=white dpi=145 fontname="DejaVu Sans" nodesep=0.35 pad=0.20 rankdir=LR ranksep=0.65 splines=polyline
+	node [color="#17618c" fillcolor="#eef5f8" fontcolor="#19364e" fontname="DejaVu Sans" fontsize=10 margin="0.18,0.11" penwidth=1.1 shape=box style="rounded,filled"]
+	edge [arrowsize=0.7 color="#4e6475" fontcolor="#4e6475" fontname="DejaVu Sans" fontsize=9]
+	rankdir=LR splines=spline
+	users [label="{users| PK id\lfull_name\lemail UNIQUE\lpassword_hash\lrole\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	categories [label="{categories| PK id\lname\lslug UNIQUE\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	auctions [label="{auctions| PK id\lFK seller_id\lFK category_id\lstatus\lreview_round\lstarts_at / ends_at\lFK winning_bid_id\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	auction_images [label="{auction_images| PK id\lFK auction_id\lstorage_key UNIQUE\lmime_type / position\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	bids [label="{bids| PK id\lFK auction_id\lFK bidder_id\lamount / placed_at\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	moderation_reviews [label="{moderation_reviews| PK id\lFK auction_id\lFK admin_id\lround UNIQUE\ldecision / reason\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	auction_status_events [label="{auction_status_events| PK id\lFK auction_id\lFK actor_user_id\levent_type / to_status\l}" fillcolor="#eef5f8" fontsize=10 shape=record style=filled]
+	users -> auctions [label="publica 1:N"]
+	categories -> auctions [label="clasifica 1:N"]
+	users -> bids [label="oferta 1:N"]
+	auctions -> bids [label="recibe 1:N"]
+	auctions -> auction_images [label="tiene 1:N"]
+	auctions -> moderation_reviews [label="revisa 1:N"]
+	users -> moderation_reviews [label="modera 1:N"]
+	auctions -> auction_status_events [label="eventos 1:N"]
+	auctions -> bids [label="winner_bid_id (misma auction)" color="#2b7c5e" constraint=false style=dashed]
+}

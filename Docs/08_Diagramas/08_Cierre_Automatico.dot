@@ -1,0 +1,22 @@
+// Cierre automático idempotente y ganador
+digraph {
+	bgcolor=white dpi=145 fontname="DejaVu Sans" nodesep=0.35 pad=0.20 rankdir=TB ranksep=0.65 splines=polyline
+	node [color="#17618c" fillcolor="#eef5f8" fontcolor="#19364e" fontname="DejaVu Sans" fontsize=10 margin="0.18,0.11" penwidth=1.1 shape=box style="rounded,filled"]
+	edge [arrowsize=0.7 color="#4e6475" fontcolor="#4e6475" fontname="DejaVu Sans" fontsize=9]
+	a [label="Job busca ACTIVA
+con ends_at vencido"]
+	b [label="Lock + revalidación"]
+	c [label="¿Sigue ACTIVA
+y vencida?" color="#bb842c" fillcolor="#fff0d9" shape=diamond]
+	d [label="Selecciona mejor bid
+o NULL"]
+	e [label="FINALIZADA + evento
+COMMIT" color="#2b7c5e" fillcolor="#e2f2e5"]
+	x [label="No hacer cambios
+idempotencia" color="#2b7c5e" fillcolor="#e2f2e5"]
+	a -> b [label=""]
+	b -> c [label=""]
+	c -> x [label=No]
+	c -> d [label="Sí"]
+	d -> e [label=""]
+}

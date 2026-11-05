@@ -1,0 +1,16 @@
+sequenceDiagram
+ participant U as Usuario Vue
+ participant API as Spring Boot
+ participant DB as PostgreSQL
+ U->>API: POST /auctions/{id}/bids
+ API->>DB: BEGIN; SELECT auctions FOR UPDATE
+ DB-->>API: Lock adquirido
+ API->>DB: SELECT mejor bid
+ DB-->>API: max(amount)
+ alt Bid valido
+   API->>DB: INSERT bids; COMMIT
+   API-->>U: 201
+ else Bid invalido o vencido
+   API->>DB: ROLLBACK
+   API-->>U: 409/422
+ end

@@ -1,0 +1,7 @@
+stateDiagram-v2
+  [*] --> PENDIENTE_REVISION
+  PENDIENTE_REVISION --> RECHAZADA : ADMIN rechaza
+  RECHAZADA --> PENDIENTE_REVISION : usuario edita/reenvia
+  PENDIENTE_REVISION --> ACTIVA : ADMIN aprueba
+  ACTIVA --> FINALIZADA : job vence
+  FINALIZADA --> [*]

@@ -1,0 +1,250 @@
+{
+  "version": "4.0",
+  "equipo": {
+    "producto": 2,
+    "scrum_master": 1,
+    "desarrollo": 9,
+    "total": 12
+  },
+  "tecnologias": [
+    "Vue 3 + Vite",
+    "Java + Spring Boot",
+    "PostgreSQL"
+  ],
+  "recuento": {
+    "historias": 18,
+    "requisitos_funcionales": 26,
+    "no_funcionales": 14,
+    "tareas_tecnicas": 72,
+    "actividades_producto_scrum": 12,
+    "diagramas": 10,
+    "tablas_sql": 7
+  },
+  "sprints": {
+    "1": {
+      "tareas": 18,
+      "horas_tecnicas": 72,
+      "horas_brutas_hipoteticas": 108,
+      "horas_reserva": 36
+    },
+    "2": {
+      "tareas": 18,
+      "horas_tecnicas": 72,
+      "horas_brutas_hipoteticas": 108,
+      "horas_reserva": 36
+    },
+    "3": {
+      "tareas": 18,
+      "horas_tecnicas": 72,
+      "horas_brutas_hipoteticas": 108,
+      "horas_reserva": 36
+    },
+    "4": {
+      "tareas": 18,
+      "horas_tecnicas": 72,
+      "horas_brutas_hipoteticas": 108,
+      "horas_reserva": 36
+    }
+  },
+  "mismo_dia": [
+    {
+      "predecesor": "G1-01",
+      "dependiente": "T1-01",
+      "sprint": 1,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G1-02",
+      "dependiente": "T1-01",
+      "sprint": 1,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T1-14",
+      "dependiente": "T1-06",
+      "sprint": 1,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T1-16",
+      "dependiente": "T1-11",
+      "sprint": 1,
+      "dia": 2,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G1-01",
+      "dependiente": "T1-15",
+      "sprint": 1,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T1-06",
+      "dependiente": "T1-18",
+      "sprint": 1,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T1-08",
+      "dependiente": "T1-18",
+      "sprint": 1,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T1-14",
+      "dependiente": "T1-18",
+      "sprint": 1,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G2-01",
+      "dependiente": "T2-01",
+      "sprint": 2,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G2-02",
+      "dependiente": "T2-01",
+      "sprint": 2,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G2-01",
+      "dependiente": "T2-15",
+      "sprint": 2,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T2-04",
+      "dependiente": "T2-18",
+      "sprint": 2,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T2-06",
+      "dependiente": "T2-18",
+      "sprint": 2,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T2-08",
+      "dependiente": "T2-18",
+      "sprint": 2,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G3-01",
+      "dependiente": "T3-01",
+      "sprint": 3,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G3-02",
+      "dependiente": "T3-01",
+      "sprint": 3,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T3-09",
+      "dependiente": "T3-03",
+      "sprint": 3,
+      "dia": 3,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T3-04",
+      "dependiente": "T3-06",
+      "sprint": 3,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G3-01",
+      "dependiente": "T3-15",
+      "sprint": 3,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T3-04",
+      "dependiente": "T3-18",
+      "sprint": 3,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "T3-08",
+      "dependiente": "T3-18",
+      "sprint": 3,
+      "dia": 5,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G4-01",
+      "dependiente": "T4-01",
+      "sprint": 4,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G4-02",
+      "dependiente": "T4-01",
+      "sprint": 4,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G1-01",
+      "dependiente": "G1-02",
+      "sprint": 1,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G1-01",
+      "dependiente": "G1-03",
+      "sprint": 1,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G2-01",
+      "dependiente": "G2-02",
+      "sprint": 2,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G3-01",
+      "dependiente": "G3-02",
+      "sprint": 3,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    },
+    {
+      "predecesor": "G4-01",
+      "dependiente": "G4-02",
+      "sprint": 4,
+      "dia": 1,
+      "control": "Entregar predecesora antes de iniciar dependiente, mismo día"
+    }
+  ],
+  "grafo": "DAG validado: sin ciclos, sin referencias perdidas, sin dependencias a sprint o día futuro",
+  "archivo_anterior_v3_sha256": "c8bea5301a71db8aa7b91d3e4d140c83c4f38b654d22475f6974013140a0dfd0",
+  "validacion_SQL": "Solo verificación estructural estática; ejecutar Flyway/consultas en PostgreSQL real antes de uso productivo"
+}

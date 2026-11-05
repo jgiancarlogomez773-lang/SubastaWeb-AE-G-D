@@ -1,0 +1,28 @@
+// Flujo de oferta ascendente protegida contra concurrencia
+digraph {
+	bgcolor=white dpi=145 fontname="DejaVu Sans" nodesep=0.35 pad=0.20 rankdir=TB ranksep=0.65 splines=polyline
+	node [color="#17618c" fillcolor="#eef5f8" fontcolor="#19364e" fontname="DejaVu Sans" fontsize=10 margin="0.18,0.11" penwidth=1.1 shape=box style="rounded,filled"]
+	edge [arrowsize=0.7 color="#4e6475" fontcolor="#4e6475" fontname="DejaVu Sans" fontsize=9]
+	a [label="POST /bids
+USER comprador"]
+	b [label="BEGIN + lock
+de auction"]
+	c [label="¿ACTIVA, tiempo
+y no vendedor?" color="#bb842c" fillcolor="#fff0d9" shape=diamond]
+	d [label="Consulta máximo
+y mínimo permitido"]
+	e [label="¿Monto válido?" color="#bb842c" fillcolor="#fff0d9" shape=diamond]
+	f [label="INSERT bid
+COMMIT 201" color="#2b7c5e" fillcolor="#e2f2e5"]
+	x [label="ROLLBACK
+403/409" color="#ae4a4a" fillcolor="#fbe7e6"]
+	y [label="ROLLBACK
+409/422" color="#ae4a4a" fillcolor="#fbe7e6"]
+	a -> b [label=""]
+	b -> c [label=""]
+	c -> x [label=No]
+	c -> d [label="Sí"]
+	d -> e [label=""]
+	e -> f [label="Sí"]
+	e -> y [label=No]
+}

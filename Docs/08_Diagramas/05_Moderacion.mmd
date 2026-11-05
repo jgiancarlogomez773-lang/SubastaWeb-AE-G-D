@@ -1,0 +1,9 @@
+flowchart TD
+ A[ADMIN consulta cola] --> B[Bloquea auction y verifica ronda]
+ B --> C{Version vigente?}
+ C -->|No| X[409 conflicto]
+ C -->|Sí| D{Decisión}
+ D -->|Aprobar| E[ACTIVA y calcula vencimiento]
+ D -->|Rechazar| F[RECHAZADA con motivo]
+ E --> G[Guarda revisión + evento]
+ F --> G

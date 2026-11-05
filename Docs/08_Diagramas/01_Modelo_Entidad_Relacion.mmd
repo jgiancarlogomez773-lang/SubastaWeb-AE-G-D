@@ -1,0 +1,50 @@
+erDiagram
+  users ||--o{ auctions : publica
+  categories ||--o{ auctions : clasifica
+  users ||--o{ bids : realiza
+  auctions ||--o{ bids : recibe
+  auctions ||--o{ auction_images : tiene
+  users ||--o{ moderation_reviews : modera
+  auctions ||--o{ moderation_reviews : revision
+  auctions ||--o{ auction_status_events : eventos
+  users ||--o{ auction_status_events : registra
+  users {
+    bigint id PK
+    varchar email UK
+    text password_hash
+    varchar role
+  }
+  categories {
+    bigint id PK
+    varchar slug UK
+  }
+  auctions {
+    bigint id PK
+    bigint seller_id FK
+    bigint category_id FK
+    varchar status
+    int review_round
+    bigint winning_bid_id FK
+  }
+  auction_images {
+    bigint id PK
+    bigint auction_id FK
+    varchar storage_key UK
+  }
+  bids {
+    bigint id PK
+    bigint auction_id FK
+    bigint bidder_id FK
+    numeric amount
+  }
+  moderation_reviews {
+    bigint id PK
+    bigint auction_id FK
+    bigint admin_id FK
+    int review_round
+  }
+  auction_status_events {
+    bigint id PK
+    bigint auction_id FK
+    bigint actor_user_id FK
+  }

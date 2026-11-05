@@ -1,0 +1,6 @@
+flowchart TD
+ A[Job busca ACTIVA vencida] --> B[SELECT FOR UPDATE]
+ B --> C{Sigue vencida y ACTIVA?}
+ C -->|No| X[Sin cambios]
+ C -->|Sí| D[Mayor bid o NULL]
+ D --> E[FINALIZADA / winner / evento / COMMIT]

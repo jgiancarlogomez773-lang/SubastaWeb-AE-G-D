@@ -1,0 +1,5 @@
+flowchart TD
+ A[USER ve RECHAZADA] --> B[Edita contenido]
+ B --> C{Version distinta al rechazo?}
+ C -->|No| X[409 sin cambios]
+ C -->|Sí| D[Incrementa ronda y vuelve a PENDIENTE_REVISION]

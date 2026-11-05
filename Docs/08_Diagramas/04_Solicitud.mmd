@@ -1,0 +1,6 @@
+flowchart TD
+ A[USER inicia sesion] --> B[Completa formulario e imagen]
+ B --> C{API valida?}
+ C -->|No| X[401 o 422 sin guardar]
+ C -->|Sí| D[Guarda PENDIENTE_REVISION]
+ D --> E[Solo visible al propietario]

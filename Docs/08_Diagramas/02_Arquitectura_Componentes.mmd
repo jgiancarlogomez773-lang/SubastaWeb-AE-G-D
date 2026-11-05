@@ -1,0 +1,6 @@
+flowchart LR
+  B[Visitante / USER / ADMIN] --> V[SPA Vue 3 + Vite]
+  V -->|REST HTTPS /api/v1| S[Spring Boot / Spring Security]
+  S -->|JPA / Flyway| DB[(PostgreSQL)]
+  S --> IMG[Almacén de imágenes]
+  JOB[Job de cierre @Scheduled] --> S

@@ -1,0 +1,17 @@
+// Ruta crítica por sprint y compuertas de avance
+digraph {
+	bgcolor=white dpi=145 fontname="DejaVu Sans" nodesep=0.35 pad=0.20 rankdir=TB ranksep=0.65 splines=polyline
+	node [color="#17618c" fillcolor="#eef5f8" fontcolor="#19364e" fontname="DejaVu Sans" fontsize=10 margin="0.18,0.11" penwidth=1.1 shape=box style="rounded,filled"]
+	edge [arrowsize=0.7 color="#4e6475" fontcolor="#4e6475" fontname="DejaVu Sans" fontsize=9]
+	s1 [label="Sprint 1
+Registro + solicitud privada"]
+	s2 [label="Sprint 2
+Rechazo + aprobación + catálogo"]
+	s3 [label="Sprint 3
+Pujas + cierre"]
+	s4 [label="Sprint 4
+Resultado + QA + entrega" color="#2b7c5e" fillcolor="#e2f2e5"]
+	s1 -> s2 [label="HITO-S1"]
+	s2 -> s3 [label="HITO-S2"]
+	s3 -> s4 [label="HITO-S3"]
+}

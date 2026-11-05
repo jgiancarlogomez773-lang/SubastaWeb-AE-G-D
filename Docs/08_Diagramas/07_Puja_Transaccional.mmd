@@ -1,0 +1,8 @@
+flowchart TD
+ A[POST puja] --> B[BEGIN / SELECT auction FOR UPDATE]
+ B --> C{Activa, tiempo y no propietario?}
+ C -->|No| X[Rollback y 403/409]
+ C -->|Sí| D[Consultar máximo vigente]
+ D --> E{Monto supera mínimo?}
+ E -->|No| Y[Rollback y 409/422]
+ E -->|Sí| F[INSERT bids + Commit 201]

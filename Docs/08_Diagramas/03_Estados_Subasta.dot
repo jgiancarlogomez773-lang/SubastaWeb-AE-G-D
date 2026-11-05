@@ -1,0 +1,15 @@
+// Estados de subasta
+digraph {
+	bgcolor=white dpi=145 fontname="DejaVu Sans" nodesep=0.35 pad=0.20 rankdir=LR ranksep=0.65 splines=polyline
+	node [color="#17618c" fillcolor="#eef5f8" fontcolor="#19364e" fontname="DejaVu Sans" fontsize=10 margin="0.18,0.11" penwidth=1.1 shape=box style="rounded,filled"]
+	edge [arrowsize=0.7 color="#4e6475" fontcolor="#4e6475" fontname="DejaVu Sans" fontsize=9]
+	p [label="PENDIENTE
+REVISION"]
+	r [label=RECHAZADA]
+	a [label=ACTIVA]
+	f [label=FINALIZADA]
+	p -> r [label="ADMIN rechaza"]
+	r -> p [label="vendedor edita+reenvía"]
+	p -> a [label="ADMIN aprueba"]
+	a -> f [label="vencimiento + job"]
+}
