@@ -1,7 +1,7 @@
 # Contrato del Sprint 2 — Moderación administrativa y publicación
 
 **Proyecto:** SubastaWeb · **Documentos base:** SRS-SW-004 v4.0 y PLAN-SW-004 v4.0 · **Hito de cierre:** HITO-S2
-**Fechas:** inicio mar 24/11/2026 · entrega lun 30/11/2026
+**Fechas:** inicio mar 24/11/2026 · entrega dom 29/11/2026
 
 > Este contrato fija lo que el equipo se compromete a entregar y lo que Frontend, Backend y Base de datos deben respetar entre sí. Cualquier cambio de alcance lo decide PO-01 y se registra en este archivo mediante Pull Request.
 
