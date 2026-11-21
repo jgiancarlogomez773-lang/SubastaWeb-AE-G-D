@@ -1,5 +1,6 @@
 package com.subastaweb.backend.application;
 
+import com.subastaweb.backend.api.LoginRequest;
 import com.subastaweb.backend.api.RegisterRequest;
 import com.subastaweb.backend.api.UserResponse;
 import com.subastaweb.backend.domain.Role;
@@ -28,7 +29,7 @@ public class AuthService {
         String normalizedName = request.fullName().trim();
 
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-            throw new EmailAlreadyExistsException("El correo ya está registrado");
+            throw new EmailAlreadyExistsException("El correo ya esta registrado");
         }
 
         User user = new User();
@@ -38,18 +39,48 @@ public class AuthService {
         user.setRole(Role.USER);
 
         User saved = userRepository.save(user);
+        return toResponse(saved);
+    }
 
+    @Transactional(readOnly = true)
+    public UserResponse authenticate(LoginRequest request) {
+        String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
+
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(() -> new InvalidCredentialsException("Credenciales invalidas"));
+
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Credenciales invalidas");
+        }
+
+        return toResponse(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse getByEmail(String email) {
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new InvalidCredentialsException("Usuario no autenticado"));
+        return toResponse(user);
+    }
+
+    private UserResponse toResponse(User user) {
         return new UserResponse(
-                saved.getId(),
-                saved.getFullName(),
-                saved.getEmail(),
-                saved.getRole(),
-                saved.getCreatedAt()
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getCreatedAt()
         );
     }
 
     public static class EmailAlreadyExistsException extends RuntimeException {
         public EmailAlreadyExistsException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidCredentialsException extends RuntimeException {
+        public InvalidCredentialsException(String message) {
             super(message);
         }
     }
