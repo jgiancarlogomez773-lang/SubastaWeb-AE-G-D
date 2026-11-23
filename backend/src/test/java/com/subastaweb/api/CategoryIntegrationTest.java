@@ -25,8 +25,7 @@ class CategoryIntegrationTest extends IntegrationTestBase {
     @Test
     void doesNotListInactiveCategories() throws Exception {
         String inactiveName = "Inactiva-" + UUID.randomUUID();
-        categories.save(new Category(inactiveName, false));
-
+        categories.save(new Category(inactiveName, inactiveName.toLowerCase(), false));
         mvc.perform(get("/api/v1/categories"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.name == '" + inactiveName + "')]").isEmpty());

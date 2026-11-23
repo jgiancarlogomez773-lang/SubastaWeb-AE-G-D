@@ -15,17 +15,21 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 80, unique = true)
+    @Column(nullable = false, length = 60)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 60, unique = true)
+    private String slug;
+
+    @Column(name = "is_active", nullable = false)
     private boolean active;
 
     protected Category() {
     }
 
-    public Category(String name, boolean active) {
+    public Category(String name, String slug, boolean active) {
         this.name = name;
+        this.slug = slug;
         this.active = active;
     }
 
@@ -35,6 +39,10 @@ public class Category {
 
     public String getName() {
         return name;
+    }
+
+    public String getSlug() {
+        return slug;
     }
 
     public boolean isActive() {

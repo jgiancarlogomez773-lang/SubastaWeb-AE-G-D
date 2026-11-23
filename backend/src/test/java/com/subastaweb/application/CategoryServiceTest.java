@@ -17,7 +17,7 @@ class CategoryServiceTest {
     @Test
     void returnsActiveCategories() {
         when(repository.findByActiveTrueOrderByNameAsc())
-                .thenReturn(List.of(new Category("Arte", true), new Category("Hogar", true)));
+                .thenReturn(List.of(new Category("Arte", "arte", true), new Category("Hogar", "hogar", true)));
 
         assertThat(service.listActive()).extracting(Category::getName).containsExactly("Arte", "Hogar");
     }
