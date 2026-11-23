@@ -13,11 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class CreateAuctionForm {
 
     @NotBlank(message = "El título es obligatorio.")
-    @Size(min = 3, max = 120, message = "El título debe tener entre 3 y 120 caracteres.")
+    @Size(min = 5, max = 120, message = "El título debe tener entre 5 y 120 caracteres.")
     private String title;
 
     @NotBlank(message = "La descripción es obligatoria.")
-    @Size(min = 10, max = 2000, message = "La descripción debe tener entre 10 y 2000 caracteres.")
+    @Size(min = 20, max = 2000, message = "La descripción debe tener entre 20 y 2000 caracteres.")
     private String description;
 
     @NotNull(message = "La categoría es obligatoria.")
@@ -30,8 +30,7 @@ public class CreateAuctionForm {
     private Long startingPrice;
 
     @NotNull(message = "La duración es obligatoria.")
-    @Min(value = AuctionRules.MIN_DURATION_HOURS, message = "La duración mínima es 1 hora.")
-    @Max(value = AuctionRules.MAX_DURATION_HOURS, message = "La duración máxima es 720 horas.")
+    @AllowedDuration
     private Integer durationHours;
 
     private MultipartFile image;

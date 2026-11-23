@@ -4,18 +4,25 @@ import java.util.Optional;
 
 /** Tipos de imagen permitidos. Se detectan por los bytes del archivo, no por el nombre ni el Content-Type. */
 public enum ImageType {
-    JPEG("jpg"),
-    PNG("png"),
-    WEBP("webp");
+    JPEG("jpg", "image/jpeg"),
+    PNG("png", "image/png"),
+    WEBP("webp", "image/webp");
 
     private final String extension;
+    private final String mimeType;
 
-    ImageType(String extension) {
+    ImageType(String extension, String mimeType) {
         this.extension = extension;
+        this.mimeType = mimeType;
     }
 
     public String extension() {
         return extension;
+    }
+
+    /** Debe coincidir con ck_auction_images_type de la base de datos. */
+    public String mimeType() {
+        return mimeType;
     }
 
     public static Optional<ImageType> detect(byte[] b) {
