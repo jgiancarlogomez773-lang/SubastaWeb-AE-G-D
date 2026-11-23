@@ -3,6 +3,7 @@ package com.subastaweb.api.dto;
 import com.subastaweb.domain.AuctionRules;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -13,11 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class CreateAuctionForm {
 
     @NotBlank(message = "El título es obligatorio.")
-    @Size(min = 3, max = 120, message = "El título debe tener entre 3 y 120 caracteres.")
+    @Size(min = 5, max = 120, message = "El título debe tener entre 5 y 120 caracteres.")
     private String title;
 
     @NotBlank(message = "La descripción es obligatoria.")
-    @Size(min = 10, max = 2000, message = "La descripción debe tener entre 10 y 2000 caracteres.")
+    @Size(min = 20, max = 2000, message = "La descripción debe tener entre 20 y 2000 caracteres.")
     private String description;
 
     @NotNull(message = "La categoría es obligatoria.")
@@ -30,9 +31,12 @@ public class CreateAuctionForm {
     private Long startingPrice;
 
     @NotNull(message = "La duración es obligatoria.")
-    @Min(value = AuctionRules.MIN_DURATION_HOURS, message = "La duración mínima es 1 hora.")
-    @Max(value = AuctionRules.MAX_DURATION_HOURS, message = "La duración máxima es 720 horas.")
+    
     private Integer durationHours;
+        @AssertTrue(message = "La duración debe ser 24, 48 o 72 horas.")
+    public boolean isDurationAllowed() {
+        return durationHours == null || AuctionRules.ALLOWED_DURATIONS_HOURS.contains(durationHours);
+    }
 
     private MultipartFile image;
 
