@@ -20,9 +20,11 @@ public enum ImageType {
         return extension;
     }
 
+    /** Debe coincidir con ck_auction_images_type de la base de datos. */
     public String mimeType() {
         return mimeType;
     }
+
     public static Optional<ImageType> detect(byte[] b) {
         if (b == null) {
             return Optional.empty();

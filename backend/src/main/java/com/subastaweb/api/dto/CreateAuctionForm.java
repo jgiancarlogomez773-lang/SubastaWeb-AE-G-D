@@ -1,9 +1,7 @@
 package com.subastaweb.api.dto;
 
 import com.subastaweb.domain.AuctionRules;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,16 +25,11 @@ public class CreateAuctionForm {
 
     @NotNull(message = "El precio inicial es obligatorio.")
     @Min(value = AuctionRules.MIN_STARTING_PRICE, message = "El precio inicial mínimo es COP 1.000.")
-    @Max(value = AuctionRules.MAX_STARTING_PRICE, message = "El precio inicial supera el máximo permitido.")
     private Long startingPrice;
 
     @NotNull(message = "La duración es obligatoria.")
-    
+    @AllowedDuration
     private Integer durationHours;
-        @AssertTrue(message = "La duración debe ser 24, 48 o 72 horas.")
-    public boolean isDurationAllowed() {
-        return durationHours == null || AuctionRules.ALLOWED_DURATIONS_HOURS.contains(durationHours);
-    }
 
     private MultipartFile image;
 

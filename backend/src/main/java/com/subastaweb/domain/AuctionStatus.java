@@ -2,7 +2,10 @@ package com.subastaweb.domain;
 
 public enum AuctionStatus {
     /** RN-02: toda solicitud nace pendiente y no es visible en el catálogo. */
-    PENDIENTE_REVISION(false);
+    PENDIENTE_REVISION(false),
+    RECHAZADA(false),
+    ACTIVA(true),
+    FINALIZADA(true);
 
     private final boolean publicVisible;
 

@@ -1,3 +1,4 @@
+
 package com.subastaweb.domain;
 
 import jakarta.persistence.Column;
@@ -10,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/** Imagen de una subasta (tabla auction_images). MVP: una imagen por subasta, posición 1 (valor por defecto en BD). */
 @Entity
 @Table(name = "auction_images")
 public class AuctionImage {
@@ -31,26 +33,21 @@ public class AuctionImage {
     @Column(name = "file_size_bytes", nullable = false)
     private int fileSizeBytes;
 
-    @Column(nullable = false)
-    private short position;
-
     protected AuctionImage() {
     }
 
-    public AuctionImage(Auction auction, String storageKey, String mimeType, int fileSizeBytes) {
-        this.auction = auction;
+    public AuctionImage(String storageKey, String mimeType, int fileSizeBytes) {
         this.storageKey = storageKey;
         this.mimeType = mimeType;
         this.fileSizeBytes = fileSizeBytes;
-        this.position = 1;
+    }
+
+    void attachTo(Auction auction) {
+        this.auction = auction;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Auction getAuction() {
-        return auction;
     }
 
     public String getStorageKey() {
@@ -63,9 +60,5 @@ public class AuctionImage {
 
     public int getFileSizeBytes() {
         return fileSizeBytes;
-    }
-
-    public short getPosition() {
-        return position;
     }
 }
