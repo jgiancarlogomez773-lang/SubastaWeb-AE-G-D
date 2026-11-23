@@ -41,8 +41,7 @@ public class Auction {
     @Column(name = "duration_hours", nullable = false)
     private int durationHours;
 
-    @Column(name = "image_path", nullable = false, length = 255)
-    private String imagePath;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -55,14 +54,14 @@ public class Auction {
     }
 
     public Auction(User seller, Category category, String title, String description,
-                   long startingPrice, int durationHours, String imagePath, AuctionStatus status) {
+                   long startingPrice, int durationHours, AuctionStatus status) {
         this.seller = seller;
         this.category = category;
         this.title = title;
         this.description = description;
         this.startingPrice = startingPrice;
         this.durationHours = durationHours;
-        this.imagePath = imagePath;
+        
         this.status = status;
         this.createdAt = Instant.now();
     }
@@ -95,9 +94,7 @@ public class Auction {
         return durationHours;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
+    
 
     public AuctionStatus getStatus() {
         return status;

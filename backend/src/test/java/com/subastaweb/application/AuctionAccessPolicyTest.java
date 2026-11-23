@@ -21,7 +21,7 @@ class AuctionAccessPolicyTest {
     private static Auction pendingAuctionOf(long sellerId) {
         User seller = new User("Vendedor", "vendedor@example.test", "hash", Role.USER);
         ReflectionTestUtils.setField(seller, "id", sellerId);
-        return new Auction(seller, null, "Titulo", "Descripcion larga", 1000, 24, "x.png",
+        return new Auction(seller, null, "Titulo", "Descripcion larga", 1000, 24,
                 AuctionStatus.PENDIENTE_REVISION);
     }
 

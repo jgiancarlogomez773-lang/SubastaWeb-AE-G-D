@@ -2,6 +2,7 @@ package com.subastaweb.application;
 
 import com.subastaweb.domain.Auction;
 import com.subastaweb.domain.AuctionRules;
+import com.subastaweb.domain.AuctionImage;
 import com.subastaweb.domain.AuctionStatus;
 import com.subastaweb.domain.Category;
 import com.subastaweb.domain.DomainException;
@@ -10,6 +11,7 @@ import com.subastaweb.domain.FieldIssue;
 import com.subastaweb.domain.ImageType;
 import com.subastaweb.domain.User;
 import com.subastaweb.persistence.AuctionRepository;
+import com.subastaweb.persistence.AuctionImageRepository;
 import com.subastaweb.persistence.CategoryRepository;
 import com.subastaweb.persistence.UserRepository;
 import java.util.List;
@@ -21,14 +23,16 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Service
 public class AuctionService {
 
-    private final AuctionRepository auctions;
+        private final AuctionRepository auctions;
+    private final AuctionImageRepository auctionImages;
     private final UserRepository users;
     private final CategoryRepository categories;
     private final ImageStorage storage;
 
-    public AuctionService(AuctionRepository auctions, UserRepository users,
-                          CategoryRepository categories, ImageStorage storage) {
+    public AuctionService(AuctionRepository auctions, AuctionImageRepository auctionImages,
+                          UserRepository users, CategoryRepository categories, ImageStorage storage) {
         this.auctions = auctions;
+        this.auctionImages = auctionImages;
         this.users = users;
         this.categories = categories;
         this.storage = storage;
@@ -53,9 +57,12 @@ public class AuctionService {
         String storedName = storage.store(cmd.image(), imageType.extension());
         deleteImageUnlessCommitted(storedName);
 
-        return auctions.save(new Auction(
+                Auction auction = auctions.save(new Auction(
                 seller, category, cmd.title().trim(), cmd.description().trim(),
-                cmd.startingPrice(), cmd.durationHours(), storedName, AuctionStatus.PENDIENTE_REVISION));
+                cmd.startingPrice(), cmd.durationHours(), AuctionStatus.PENDIENTE_REVISION));
+        auctionImages.save(new AuctionImage(
+                auction, storedName, imageType.mimeType(), cmd.image().length));
+        return auction;
     }
 
     private ImageType validateImage(byte[] image) {
