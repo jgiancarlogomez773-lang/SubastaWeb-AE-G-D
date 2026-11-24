@@ -1,0 +1,13 @@
+:root {
+  --primario: #1d4ed8;
+  --texto: #1f2937;
+  --suave: #6b7280;
+  --borde: #e5e7eb;
+  --fondo: #f5f6fa;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--texto);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); }
+h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+.subtitulo { margin: 0 0 1.25rem; color: var(--suave); }
