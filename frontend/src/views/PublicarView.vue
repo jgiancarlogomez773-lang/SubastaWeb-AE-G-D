@@ -3,6 +3,7 @@ import { reactive, ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { obtenerCategorias, enviarSolicitud } from '../services/subastas'
 import { validarSolicitud, validarImagen, DURACIONES } from '../services/validacionSolicitud'
+import { erroresDeServidor } from '../services/validacion'
 
 const router = useRouter()
 
@@ -56,18 +57,32 @@ async function enviar() {
   cargando.value = true
   try {
     enviada.value = await enviarSolicitud({ ...form })
-  } catch {
-    error.value = 'No pudimos enviar la solicitud. Inténtalo de nuevo en unos minutos.'
+    limpiarFormulario()
+  } catch (e) {
+    if (e.status === 422) {
+      errores.value = erroresDeServidor(e.details)
+      if (!Object.keys(errores.value).length) error.value = e.message
+    } else if (e.status === 403) {
+      error.value = 'Tu cuenta no tiene permiso para publicar artículos.'
+    } else if (e.status !== 401) {
+      // El 401 lo atiende el cliente: limpia la sesión y manda al login.
+      error.value = 'No pudimos enviar la solicitud. Inténtalo de nuevo en unos minutos.'
+    }
   } finally {
     cargando.value = false
   }
 }
 
-function otraSolicitud() {
-  enviada.value = null
+// Tras el éxito el formulario queda vacío; la confirmación sigue visible hasta elegir otra solicitud.
+function limpiarFormulario() {
   Object.assign(form, { title: '', description: '', categoryId: '', startingPrice: '', durationHours: 24, image: null })
   liberarVistaPrevia()
   errores.value = {}
+}
+
+function otraSolicitud() {
+  enviada.value = null
+  limpiarFormulario()
 }
 </script>
 
@@ -78,7 +93,7 @@ function otraSolicitud() {
 
     <div v-if="enviada" class="exito" role="status">
       <strong>Solicitud enviada a revisión.</strong>
-      <p>«{{ enviada.title }}» quedó en estado {{ enviada.status }} y no es visible en el catálogo.</p>
+      <p>«{{ enviada.title }}» quedó en estado {{ enviada.status }}: es privada y no aparece en el catálogo hasta que un administrador la apruebe.</p>
       <button type="button" class="secundario" @click="otraSolicitud">Publicar otro artículo</button>
     </div>
 
