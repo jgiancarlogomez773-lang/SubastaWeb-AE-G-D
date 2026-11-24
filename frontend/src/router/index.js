@@ -25,7 +25,8 @@ const rutas = [
     path: '/publicar',
     name: 'publicar',
     component: () => import('../views/PublicarView.vue'),
-    meta: { requiereSesion: true },
+    // El backend solo deja crear solicitudes al rol USER (POST /auctions → hasRole USER).
+    meta: { requiereSesion: true, rol: 'USER' },
   },
   {
     path: '/mis-subastas',

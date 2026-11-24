@@ -16,9 +16,9 @@ const base = [
 // Visitantes ven solo el catálogo; usuarios con sesión ven sus secciones; ADMIN, la bandeja.
 const enlaces = computed(() => {
   if (!sesion.usuario) return base.slice(0, 1)
-  const lista = [...base]
-  if (sesion.usuario.role === 'ADMIN') lista.push({ to: '/admin', texto: 'Bandeja de revisión' })
-  return lista
+  // ADMIN no publica ni puja: ve el catálogo y la bandeja de revisión.
+  if (sesion.usuario.role === 'ADMIN') return [base[0], { to: '/admin', texto: 'Bandeja de revisión' }]
+  return base
 })
 
 async function cerrar() {

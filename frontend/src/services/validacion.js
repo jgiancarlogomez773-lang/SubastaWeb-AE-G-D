@@ -19,11 +19,11 @@ export function validarRegistro({ fullName, email, password, confirmacion }) {
   return errores
 }
 
-// Convierte details del 422 ([{ field, issue }]) en errores por campo del formulario.
+// Convierte details del 422 ([{ field, message }]) en errores por campo del formulario.
 export function erroresDeServidor(details) {
   const errores = {}
   for (const d of details || []) {
-    if (d && d.field && !errores[d.field]) errores[d.field] = d.issue
+    if (d && d.field && !errores[d.field]) errores[d.field] = d.message || d.issue
   }
   return errores
 }
