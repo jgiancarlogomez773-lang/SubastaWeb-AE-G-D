@@ -45,7 +45,8 @@ async function enviar() {
     <h1>Iniciar sesión</h1>
     <p class="subtitulo">Entra para publicar artículos y pujar.</p>
 
-    <p v-if="route.query.redirect && !error" class="aviso" role="status">Inicia sesión para continuar.</p>
+    <p v-if="route.query.registrado && !error" class="exito" role="status">Cuenta creada. Ya puedes iniciar sesión.</p>
+    <p v-else-if="route.query.redirect && !error" class="aviso" role="status">Inicia sesión para continuar.</p>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
 
     <form novalidate @submit.prevent="enviar">
@@ -74,6 +75,7 @@ button { margin-top: 1rem; padding: 0.7rem; border: 0; border-radius: 8px; backg
 button:disabled { opacity: 0.6; cursor: wait; }
 .error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 8px; padding: 0.6rem 0.8rem; }
 .aviso { background: #eff6ff; color: #1e40af; border-radius: 8px; padding: 0.6rem 0.8rem; }
+.exito { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 8px; padding: 0.6rem 0.8rem; }
 .campo-error { color: #b91c1c; }
 .pie { color: var(--suave); }
 .demo { font-size: 0.8rem; }
