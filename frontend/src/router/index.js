@@ -24,8 +24,7 @@ const rutas = [
   {
     path: '/publicar',
     name: 'publicar',
-    component: PantallaPendiente,
-    props: { titulo: 'Publicar artículo', tarea: 'T1-07' },
+    component: () => import('../views/PublicarView.vue'),
     meta: { requiereSesion: true },
   },
   {
