@@ -1,6 +1,6 @@
 // Servicio de autenticación. Con VITE_USAR_MOCK distinto de 'false' usa datos
 // simulados que respetan el contrato; T1-06 conecta la sesión real.
-import { pedir, olvidarCsrf, ErrorApi } from './api'
+import { pedir, ErrorApi } from './api'
 
 export const usarMock = import.meta.env.VITE_USAR_MOCK !== 'false'
 
@@ -30,15 +30,8 @@ function leerRegistrados() {
 const pausa = (ms = 300) => new Promise((r) => setTimeout(r, ms))
 
 const real = {
-  login: async (email, password) => {
-    const u = await pedir('POST', '/auth/login', { email, password })
-    olvidarCsrf()
-    return u
-  },
-  logout: async () => {
-    await pedir('POST', '/auth/logout')
-    olvidarCsrf()
-  },
+  login: (email, password) => pedir('POST', '/auth/login', { email, password }),
+  logout: () => pedir('POST', '/auth/logout'),
   registrar: (datos) => pedir('POST', '/auth/register', datos),
   usuarioActual: async () => {
     try {

@@ -26,7 +26,7 @@ test('nombre de más de 150 caracteres', () => {
   assert.ok(validarRegistro({ ...valido, fullName: 'a'.repeat(151) }).fullName)
 })
 test('erroresDeServidor mapea details del 422', () => {
-  const e = erroresDeServidor([{ field: 'email', issue: 'mal' }, { field: 'email', issue: 'otro' }, { field: 'password', issue: 'corta' }])
+  const e = erroresDeServidor([{ field: 'email', message: 'mal' }, { field: 'email', message: 'otro' }, { field: 'password', message: 'corta' }])
   assert.deepEqual(e, { email: 'mal', password: 'corta' })
   assert.deepEqual(erroresDeServidor(undefined), {})
 })

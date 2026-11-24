@@ -32,3 +32,7 @@ test('destinoSeguro rechaza redirecciones externas', () => {
   assert.equal(destinoSeguro('https://evil.com'), '/')
   assert.equal(destinoSeguro(undefined), '/')
 })
+test('ADMIN en ruta de USER (publicar) va a 403', () => {
+  const r = decidirAcceso({ name: 'publicar', meta: { requiereSesion: true, rol: 'USER' } }, admin)
+  assert.deepEqual(r, { name: 'prohibido' })
+})
