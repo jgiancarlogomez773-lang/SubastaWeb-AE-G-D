@@ -18,6 +18,15 @@ function leerMock() {
   }
 }
 
+const CLAVE_REGISTRADOS = 'subastaweb.mock.registrados'
+function leerRegistrados() {
+  try {
+    return JSON.parse(sessionStorage.getItem(CLAVE_REGISTRADOS)) || []
+  } catch {
+    return []
+  }
+}
+
 const pausa = (ms = 300) => new Promise((r) => setTimeout(r, ms))
 
 const real = {
@@ -30,6 +39,7 @@ const real = {
     await pedir('POST', '/auth/logout')
     olvidarCsrf()
   },
+  registrar: (datos) => pedir('POST', '/auth/register', datos),
   usuarioActual: async () => {
     try {
       return await pedir('GET', '/auth/me')
@@ -43,7 +53,7 @@ const real = {
 const mock = {
   login: async (email, password) => {
     await pausa()
-    const u = USUARIOS_MOCK.find((x) => x.email === email.trim().toLowerCase() && x.password === password)
+    const u = [...USUARIOS_MOCK, ...leerRegistrados()].find((x) => x.email === email.trim().toLowerCase() && x.password === password)
     if (!u) throw new ErrorApi(401, { code: 'AUTH_REQUIRED', message: 'Correo o contraseña incorrectos.' })
     const { password: _omitida, ...publico } = u
     sessionStorage.setItem(CLAVE, JSON.stringify(publico))
@@ -53,10 +63,23 @@ const mock = {
     await pausa(100)
     sessionStorage.removeItem(CLAVE)
   },
+  // Simula POST /auth/register: 201 con el usuario creado (siempre USER) o 409 si el correo existe.
+  registrar: async ({ fullName, email, password }) => {
+    await pausa()
+    const correo = email.trim().toLowerCase()
+    const registrados = leerRegistrados()
+    const existe = [...USUARIOS_MOCK, ...registrados].some((x) => x.email === correo)
+    if (existe) throw new ErrorApi(409, { code: 'EMAIL_ALREADY_EXISTS', message: 'Ya existe una cuenta con ese correo.' })
+    const nuevo = { id: Date.now(), fullName: fullName.trim(), email: correo, password, role: 'USER' }
+    sessionStorage.setItem(CLAVE_REGISTRADOS, JSON.stringify([...registrados, nuevo]))
+    const { password: _omitida, ...publico } = nuevo
+    return publico
+  },
   usuarioActual: async () => leerMock(),
 }
 
 const servicio = usarMock ? mock : real
 export const iniciarSesion = servicio.login
+export const registrarUsuario = servicio.registrar
 export const cerrarSesion = servicio.logout
 export const obtenerUsuarioActual = servicio.usuarioActual
