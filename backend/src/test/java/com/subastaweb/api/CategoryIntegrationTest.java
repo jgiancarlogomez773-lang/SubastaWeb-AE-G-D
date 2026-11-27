@@ -19,13 +19,14 @@ class CategoryIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
                 .andExpect(jsonPath("$[0].name").isNotEmpty())
+                .andExpect(jsonPath("$[0].slug").isNotEmpty())
                 .andExpect(jsonPath("$[0].active").doesNotExist());
     }
 
     @Test
     void doesNotListInactiveCategories() throws Exception {
         String inactiveName = "Inactiva-" + UUID.randomUUID();
-        categories.save(new Category(inactiveName, false));
+        categories.save(new Category(inactiveName, "inactiva-" + UUID.randomUUID(), false));
 
         mvc.perform(get("/api/v1/categories"))
                 .andExpect(status().isOk())
@@ -34,8 +35,7 @@ class CategoryIntegrationTest extends IntegrationTestBase {
 
     @Test
     void returnsEmptyListWhenThereAreNoCategories() throws Exception {
-        categories.deleteAll();
-        categories.flush();
+        categories.deleteAllInBatch();
 
         mvc.perform(get("/api/v1/categories"))
                 .andExpect(status().isOk())

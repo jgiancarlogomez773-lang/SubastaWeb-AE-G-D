@@ -20,6 +20,8 @@ mvn spring-boot:run
 ```
 
 ## Pruebas (usan H2 en memoria, no necesitan PostgreSQL)
+El esquema de pruebas se genera desde las entidades. Las migraciones reales de PostgreSQL son las de Base de datos
+(T1-15, T1-16, T1-17) y se prueban arrancando la aplicación contra PostgreSQL.
 ```bash
 mvn test
 ```
@@ -34,4 +36,12 @@ mvn test
 | T1-13 | `GET /categories` (público) + manejo global de errores |
 | T1-14 | Reglas de acceso en `SecurityConfig` + `AuctionAccessPolicy` (propiedad y visibilidad) |
 
-Las migraciones `V1`–`V3` son una base mínima para poder arrancar: deben alinearse con las de Base de datos (T1-15, T1-16, T1-17).
+Las entidades siguen el modelo oficial `Docs/07_Base_de_Datos` (tablas `users`, `categories`, `auctions`, `auction_images`).
+La duración de una subasta solo puede ser 24, 48 o 72 horas (RN-06).
+
+## Sprint 2 — qué hay
+| Tarea | Qué implementa |
+|-------|----------------|
+| T2-13 | `GET /auctions?page=0&size=12` — catálogo público paginado, solo ACTIVA y FINALIZADA (más recientes primero, `size` máx. 50) |
+| T2-14 | `GET /auctions/{id}` — detalle con DTO público sin datos del vendedor; una subasta privada responde 404 (`AUCTION_NOT_PUBLIC`) salvo a su dueño ("Público o dueño") |
+

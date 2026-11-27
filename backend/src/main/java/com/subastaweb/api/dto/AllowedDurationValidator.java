@@ -8,7 +8,6 @@ public class AllowedDurationValidator implements ConstraintValidator<AllowedDura
 
     @Override
     public boolean isValid(Integer value, ConstraintValidatorContext context) {
-        // null lo controla @NotNull
-        return value == null || AuctionRules.isAllowedDuration(value);
+        return value == null || AuctionRules.isAllowedDuration(value); // null lo cubre @NotNull
     }
 }

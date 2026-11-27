@@ -6,9 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.text.Normalizer;
-import java.util.Locale;
 
+/** Tabla categories (V1 oficial: id, name, slug único, is_active). */
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -27,11 +26,6 @@ public class Category {
     private boolean active;
 
     protected Category() {
-    }
-
-    /** Genera el slug a partir del nombre (ej. "Electrónica" -> "electronica"). */
-    public Category(String name, boolean active) {
-        this(name, slugify(name), active);
     }
 
     public Category(String name, String slug, boolean active) {
@@ -54,14 +48,5 @@ public class Category {
 
     public boolean isActive() {
         return active;
-    }
-
-    static String slugify(String text) {
-        String base = Normalizer.normalize(text, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("(^-+|-+$)", "");
-        return base.isEmpty() ? "categoria" : base;
     }
 }

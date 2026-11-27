@@ -18,11 +18,14 @@ class AuctionAccessPolicyTest {
 
     private final AuctionAccessPolicy policy = new AuctionAccessPolicy();
 
-    private static Auction pendingAuctionOf(long sellerId) {
+    private static Auction auctionOf(long sellerId, AuctionStatus status) {
         User seller = new User("Vendedor", "vendedor@example.test", "hash", Role.USER);
         ReflectionTestUtils.setField(seller, "id", sellerId);
-        return new Auction(seller, null, "Titulo", "Descripcion larga", 1000, 24, "x.png",
-                AuctionStatus.PENDIENTE_REVISION);
+        return new Auction(seller, null, "Titulo", "Descripcion larga de prueba", 1000, 24, status);
+    }
+
+    private static Auction pendingAuctionOf(long sellerId) {
+        return auctionOf(sellerId, AuctionStatus.PENDIENTE_REVISION);
     }
 
     @Test
@@ -50,18 +53,32 @@ class AuctionAccessPolicyTest {
     void pendingAuctionIsHiddenFromOthersWith404() {
         Auction auction = pendingAuctionOf(1L);
 
-        assertThatThrownBy(() -> policy.requireVisible(2L, Role.USER, auction))
+        assertThatThrownBy(() -> policy.requireVisible(2L, auction))
                 .isInstanceOfSatisfying(DomainException.class,
                         e -> assertThat(e.code()).isEqualTo(ErrorCode.AUCTION_NOT_PUBLIC));
-        assertThatThrownBy(() -> policy.requireVisible(null, null, auction))
+        assertThatThrownBy(() -> policy.requireVisible(null, auction))
                 .isInstanceOf(DomainException.class);
     }
 
     @Test
-    void pendingAuctionIsVisibleToOwnerAndAdmin() {
+    void pendingAuctionIsVisibleOnlyToItsOwner() {
         Auction auction = pendingAuctionOf(1L);
 
-        assertThatCode(() -> policy.requireVisible(1L, Role.USER, auction)).doesNotThrowAnyException();
-        assertThatCode(() -> policy.requireVisible(99L, Role.ADMIN, auction)).doesNotThrowAnyException();
+        assertThatCode(() -> policy.requireVisible(1L, auction)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void activeAuctionIsVisibleToEveryone() {
+        Auction auction = auctionOf(1L, AuctionStatus.ACTIVA);
+
+        assertThatCode(() -> policy.requireVisible(null, auction)).doesNotThrowAnyException();
+        assertThatCode(() -> policy.requireVisible(2L, auction)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void rejectedAuctionIsHiddenFromOthers() {
+        Auction auction = auctionOf(1L, AuctionStatus.RECHAZADA);
+
+        assertThatThrownBy(() -> policy.requireVisible(2L, auction)).isInstanceOf(DomainException.class);
     }
 }

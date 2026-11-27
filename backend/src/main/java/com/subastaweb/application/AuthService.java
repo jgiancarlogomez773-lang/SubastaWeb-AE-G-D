@@ -7,6 +7,7 @@ import com.subastaweb.domain.Role;
 import com.subastaweb.domain.User;
 import com.subastaweb.persistence.UserRepository;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -36,16 +37,23 @@ public class AuthService {
     @Transactional
     public User register(String fullName, String email, String rawPassword) {
         String normalized = normalizeEmail(email);
+        String name = fullName.trim();
+        List<FieldIssue> issues = new ArrayList<>();
+        if (name.length() < 2 || name.length() > 100) {
+            issues.add(new FieldIssue("fullName", "El nombre debe tener entre 2 y 100 caracteres."));
+        }
         if (tooLong(rawPassword)) {
-            throw new DomainException(ErrorCode.VALIDATION_ERROR, "Los datos enviados no son válidos.",
-                    List.of(new FieldIssue("password", "La contraseña es demasiado larga.")));
+            issues.add(new FieldIssue("password", "La contraseña es demasiado larga."));
+        }
+        if (!issues.isEmpty()) {
+            throw new DomainException(ErrorCode.VALIDATION_ERROR, "Los datos enviados no son válidos.", issues);
         }
         if (users.existsByEmail(normalized)) {
             throw emailTaken();
         }
         try {
             return users.saveAndFlush(
-                    new User(fullName.trim(), normalized, encoder.encode(rawPassword), Role.USER));
+                    new User(name, normalized, encoder.encode(rawPassword), Role.USER));
         } catch (DataIntegrityViolationException e) {
             throw emailTaken();
         }

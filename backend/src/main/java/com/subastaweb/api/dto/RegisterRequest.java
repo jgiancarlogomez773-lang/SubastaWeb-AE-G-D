@@ -11,7 +11,7 @@ public record RegisterRequest(
 
         @NotBlank(message = "El correo es obligatorio.")
         @Email(message = "El correo no tiene un formato válido.")
-        @Size(max = 254, message = "El correo es demasiado largo.")
+        @Size(min = 5, max = 254, message = "El correo debe tener entre 5 y 254 caracteres.")
         String email,
 
         @NotBlank(message = "La contraseña es obligatoria.")

@@ -13,11 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class CreateAuctionForm {
 
     @NotBlank(message = "El título es obligatorio.")
-    @Size(min = 5, max = 120, message = "El título debe tener entre 5 y 120 caracteres.")
+    @Size(min = AuctionRules.TITLE_MIN, max = AuctionRules.TITLE_MAX,
+            message = "El título debe tener entre 5 y 120 caracteres.")
     private String title;
 
     @NotBlank(message = "La descripción es obligatoria.")
-    @Size(min = 20, max = 2000, message = "La descripción debe tener entre 20 y 2000 caracteres.")
+    @Size(min = AuctionRules.DESCRIPTION_MIN, max = AuctionRules.DESCRIPTION_MAX,
+            message = "La descripción debe tener entre 20 y 2000 caracteres.")
     private String description;
 
     @NotNull(message = "La categoría es obligatoria.")

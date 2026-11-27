@@ -3,7 +3,6 @@ package com.subastaweb.application;
 import com.subastaweb.domain.Auction;
 import com.subastaweb.domain.DomainException;
 import com.subastaweb.domain.ErrorCode;
-import com.subastaweb.domain.Role;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,11 +23,9 @@ public class AuctionAccessPolicy {
         }
     }
 
-    /** 404: una subasta no pública solo existe para su vendedor o para un ADMIN. */
-    public void requireVisible(Long actorId, Role actorRole, Auction auction) {
-        boolean visible = auction.getStatus().isPublicVisible()
-                || isOwner(actorId, auction)
-                || actorRole == Role.ADMIN;
+    /** 404: una subasta no pública solo existe para su dueño (contrato S2: "Público o dueño"). */
+    public void requireVisible(Long actorId, Auction auction) {
+        boolean visible = auction.getStatus().isPublicVisible() || isOwner(actorId, auction);
         if (!visible) {
             throw new DomainException(ErrorCode.AUCTION_NOT_PUBLIC, "La subasta no está disponible.");
         }

@@ -25,7 +25,7 @@ class AuctionIntegrationTest extends IntegrationTestBase {
     }
 
     private ResultActions postAuction(MockHttpSession session, MockMultipartFile image, String price,
-                                      Long categoryId) throws Exception {
+                                      Long categoryId, String durationHours) throws Exception {
         MockMultipartHttpServletRequestBuilder request = multipart("/api/v1/auctions");
         if (image != null) {
             request.file(image);
@@ -34,7 +34,7 @@ class AuctionIntegrationTest extends IntegrationTestBase {
         request.param("description", "Reloj en buen estado, funciona perfectamente.");
         request.param("categoryId", String.valueOf(categoryId));
         request.param("startingPrice", price);
-        request.param("durationHours", "48");
+        request.param("durationHours", durationHours);
         if (session != null) {
             request.session(session);
         }
@@ -49,24 +49,54 @@ class AuctionIntegrationTest extends IntegrationTestBase {
         return new MockMultipartFile("image", "foto.png", "image/png", PNG_HEADER);
     }
 
+    private void assertNothingPersisted() throws Exception {
+        assertThat(auctions.count()).isZero();
+        assertThat(auctionImages.count()).isZero();
+        assertThat(uploadsCount()).isZero();
+    }
+
     @Test
-    void validRequestIsStoredAsPendingReview() throws Exception {
-        postAuction(userSession(), png(), "50000", firstCategoryId())
+    void validRequestIsStoredAsPendingReviewWithItsImage() throws Exception {
+        postAuction(userSession(), png(), "50000", firstCategoryId(), "48")
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDIENTE_REVISION"))
-                .andExpect(jsonPath("$.startingPrice").value(50000));
+                .andExpect(jsonPath("$.startingPrice").value(50000))
+                .andExpect(jsonPath("$.durationHours").value(48));
 
         assertThat(auctions.findAll()).hasSize(1);
         assertThat(auctions.findAll().get(0).getStatus()).isEqualTo(AuctionStatus.PENDIENTE_REVISION);
+        assertThat(auctionImages.findAll()).hasSize(1);
+        assertThat(auctionImages.findAll().get(0).getMimeType()).isEqualTo("image/png");
+        assertThat(auctionImages.findAll().get(0).getPosition()).isEqualTo(1);
         assertThat(uploadsCount()).isEqualTo(1);
     }
 
     @Test
+    void allowedDurationsAre24And48And72() throws Exception {
+        MockHttpSession session = userSession();
+        for (String hours : new String[] {"24", "72"}) {
+            postAuction(session, png(), "50000", firstCategoryId(), hours)
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.durationHours").value(Integer.parseInt(hours)));
+        }
+    }
+
+    @Test
+    void durationOutsideAllowedValuesReturns422() throws Exception {
+        postAuction(userSession(), png(), "50000", firstCategoryId(), "36")
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.details[0].field").value("durationHours"));
+
+        assertNothingPersisted();
+    }
+
+    @Test
     void requestWithoutSessionReturns401() throws Exception {
-        postAuction(null, png(), "50000", firstCategoryId())
+        postAuction(null, png(), "50000", firstCategoryId(), "48")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTH_REQUIRED"));
-        assertThat(auctions.count()).isZero();
+        assertNothingPersisted();
     }
 
     @Test
@@ -74,12 +104,11 @@ class AuctionIntegrationTest extends IntegrationTestBase {
         MockMultipartFile fake = new MockMultipartFile("image", "foto.png", "image/png",
                 "no soy una imagen".getBytes(StandardCharsets.UTF_8));
 
-        postAuction(userSession(), fake, "50000", firstCategoryId())
+        postAuction(userSession(), fake, "50000", firstCategoryId(), "48")
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("INVALID_IMAGE"));
 
-        assertThat(auctions.count()).isZero();
-        assertThat(uploadsCount()).isZero();
+        assertNothingPersisted();
     }
 
     @Test
@@ -88,49 +117,46 @@ class AuctionIntegrationTest extends IntegrationTestBase {
         System.arraycopy(PNG_HEADER, 0, big, 0, PNG_HEADER.length);
         MockMultipartFile tooBig = new MockMultipartFile("image", "grande.png", "image/png", big);
 
-        postAuction(userSession(), tooBig, "50000", firstCategoryId())
+        postAuction(userSession(), tooBig, "50000", firstCategoryId(), "48")
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("INVALID_IMAGE"));
 
-        assertThat(auctions.count()).isZero();
-        assertThat(uploadsCount()).isZero();
+        assertNothingPersisted();
     }
 
     @Test
     void missingImageReturns422() throws Exception {
-        postAuction(userSession(), null, "50000", firstCategoryId())
+        postAuction(userSession(), null, "50000", firstCategoryId(), "48")
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("INVALID_IMAGE"));
-        assertThat(auctions.count()).isZero();
+        assertNothingPersisted();
     }
 
     @Test
     void priceBelowMinimumReturns422() throws Exception {
-        postAuction(userSession(), png(), "999", firstCategoryId())
+        postAuction(userSession(), png(), "999", firstCategoryId(), "48")
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.details[0].field").value("startingPrice"));
 
-        assertThat(auctions.count()).isZero();
-        assertThat(uploadsCount()).isZero();
+        assertNothingPersisted();
     }
 
     @Test
     void nonNumericPriceReturns422() throws Exception {
-        postAuction(userSession(), png(), "abc", firstCategoryId())
+        postAuction(userSession(), png(), "abc", firstCategoryId(), "48")
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
-        assertThat(auctions.count()).isZero();
+        assertNothingPersisted();
     }
 
     @Test
     void unknownCategoryReturns422WithoutPartialPersistence() throws Exception {
-        postAuction(userSession(), png(), "50000", 999_999L)
+        postAuction(userSession(), png(), "50000", 999_999L, "48")
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.details[0].field").value("categoryId"));
 
-        assertThat(auctions.count()).isZero();
-        assertThat(uploadsCount()).isZero();
+        assertNothingPersisted();
     }
 }

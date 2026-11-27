@@ -9,8 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
 
-/** Imagen de una subasta (tabla auction_images). MVP: una imagen por subasta, posición 1 (valor por defecto en BD). */
+/** Tabla auction_images (V2 oficial). MVP: una imagen por solicitud, posición 1. */
 @Entity
 @Table(name = "auction_images")
 public class AuctionImage {
@@ -32,21 +33,31 @@ public class AuctionImage {
     @Column(name = "file_size_bytes", nullable = false)
     private int fileSizeBytes;
 
+    // "position" va entre comillas porque es palabra clave de SQL.
+    @Column(name = "`position`", nullable = false)
+    private short position;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
     protected AuctionImage() {
     }
 
-    public AuctionImage(String storageKey, String mimeType, int fileSizeBytes) {
+    public AuctionImage(Auction auction, String storageKey, String mimeType, int fileSizeBytes) {
+        this.auction = auction;
         this.storageKey = storageKey;
         this.mimeType = mimeType;
         this.fileSizeBytes = fileSizeBytes;
-    }
-
-    void attachTo(Auction auction) {
-        this.auction = auction;
+        this.position = 1;
+        this.createdAt = Instant.now();
     }
 
     public Long getId() {
         return id;
+    }
+
+    public Auction getAuction() {
+        return auction;
     }
 
     public String getStorageKey() {
@@ -59,5 +70,13 @@ public class AuctionImage {
 
     public int getFileSizeBytes() {
         return fileSizeBytes;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 }

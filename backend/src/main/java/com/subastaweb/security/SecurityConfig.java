@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,7 +23,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * T1-14: matriz de permisos del Sprint 1.
  *
  * <pre>
- * Público ........ POST /auth/register, POST /auth/login, GET /categories
+ * Público ........ POST /auth/register, POST /auth/login, GET /categories,
+ * ................. GET /auctions, GET /auctions/{id} (el detalle aplica reglas por estado)
  * USER ........... POST /auctions
  * ADMIN .......... /admin/**
  * USER o ADMIN ... el resto de /api/v1/** (logout, me, ...)
@@ -65,6 +67,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auctions").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/v1/auctions/{id:\\d+}"))
+                                .permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/auctions").hasRole("USER")
                         .requestMatchers("/api/v1/**").authenticated()
