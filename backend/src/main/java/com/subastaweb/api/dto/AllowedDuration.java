@@ -8,14 +8,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** La duración de la subasta solo puede ser 24, 48 o 72 horas. */
+/** RN-06: la duración solo puede ser 24, 48 o 72 horas. */
 @Documented
-@Constraint(validatedBy = AllowedDurationValidator.class)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = AllowedDurationValidator.class)
 public @interface AllowedDuration {
 
-    String message() default "La duración debe ser de 24, 48 o 72 horas.";
+    String message() default "La duración debe ser 24, 48 o 72 horas.";
 
     Class<?>[] groups() default {};
 

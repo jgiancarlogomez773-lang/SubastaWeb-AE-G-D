@@ -16,7 +16,9 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /** T1-13: manejo global de errores en Spring Web con el formato del contrato. */
@@ -53,6 +55,17 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiError> handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
         return build(ErrorCode.VALIDATION_ERROR.status(), ErrorCode.VALIDATION_ERROR.name(),
                 "El cuerpo de la solicitud no es válido.", List.of(), request);
+    }
+
+    /** Un parámetro de consulta con tipo incorrecto es 422; un id de ruta que no es número es 404. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        if (ex.getParameter().hasParameterAnnotation(PathVariable.class)) {
+            return build(404, "NOT_FOUND", "El recurso solicitado no existe.", List.of(), request);
+        }
+        return build(ErrorCode.VALIDATION_ERROR.status(), ErrorCode.VALIDATION_ERROR.name(),
+                "Los parámetros de consulta no son válidos.",
+                List.of(new FieldIssue(ex.getName(), "El valor tiene un formato inválido.")), request);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

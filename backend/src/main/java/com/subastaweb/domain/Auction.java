@@ -1,6 +1,5 @@
 package com.subastaweb.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,19 +10,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 /**
- * Subasta. Solo se mapean las columnas que usa el Sprint 1; el resto de columnas de la tabla
- * (min_increment, review_round, fechas de aprobación, etc.) tienen valor por defecto en la base de datos.
+ * Tabla auctions (V2 oficial). Las demás columnas (min_increment, review_round, content_version, fechas de
+ * aprobación/cierre, updated_at...) las llena la base con sus valores por defecto o las usarán sprints posteriores.
  */
 @Entity
 @Table(name = "auctions")
@@ -47,25 +40,24 @@ public class Auction {
     @Column(nullable = false, length = 2000)
     private String description;
 
-    /** La base usa NUMERIC(14,0). */
-    @JdbcTypeCode(SqlTypes.NUMERIC)
     @Column(name = "starting_price", nullable = false, precision = 14, scale = 0)
-    private long startingPrice;
+    private BigDecimal startingPrice;
 
-    /** La base usa SMALLINT. */
-    @JdbcTypeCode(SqlTypes.SMALLINT)
     @Column(name = "duration_hours", nullable = false)
-    private int durationHours;
+    private short durationHours;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 22)
     private AuctionStatus status;
 
+    @Column(name = "starts_at")
+    private Instant startsAt;
+
+    @Column(name = "ends_at")
+    private Instant endsAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
-
-    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuctionImage> images = new ArrayList<>();
 
     protected Auction() {
     }
@@ -76,36 +68,10 @@ public class Auction {
         this.category = category;
         this.title = title;
         this.description = description;
-        this.startingPrice = startingPrice;
-        this.durationHours = durationHours;
+        this.startingPrice = BigDecimal.valueOf(startingPrice);
+        this.durationHours = (short) durationHours;
         this.status = status;
         this.createdAt = Instant.now();
-    }
-
-    /**
-     * Constructor de compatibilidad: crea la subasta y su imagen a partir del nombre del archivo.
-     * Lo conserva para código y pruebas que ya lo usaban (el tamaño real se registra con addImage).
-     */
-    public Auction(User seller, Category category, String title, String description,
-                   long startingPrice, int durationHours, String imagePath, AuctionStatus status) {
-        this(seller, category, title, description, startingPrice, durationHours, status);
-        addImage(new AuctionImage(imagePath, guessMimeType(imagePath), 1));
-    }
-
-    public void addImage(AuctionImage image) {
-        image.attachTo(this);
-        images.add(image);
-    }
-
-    private static String guessMimeType(String name) {
-        String lower = name == null ? "" : name.toLowerCase(Locale.ROOT);
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
-            return "image/jpeg";
-        }
-        if (lower.endsWith(".webp")) {
-            return "image/webp";
-        }
-        return "image/png";
     }
 
     public Long getId() {
@@ -129,7 +95,7 @@ public class Auction {
     }
 
     public long getStartingPrice() {
-        return startingPrice;
+        return startingPrice.longValueExact();
     }
 
     public int getDurationHours() {
@@ -140,16 +106,15 @@ public class Auction {
         return status;
     }
 
+    public Instant getStartsAt() {
+        return startsAt;
+    }
+
+    public Instant getEndsAt() {
+        return endsAt;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public List<AuctionImage> getImages() {
-        return Collections.unmodifiableList(images);
-    }
-
-    /** Nombre del archivo de la primera imagen (null si no tiene). */
-    public String getImagePath() {
-        return images.isEmpty() ? null : images.get(0).getStorageKey();
     }
 }

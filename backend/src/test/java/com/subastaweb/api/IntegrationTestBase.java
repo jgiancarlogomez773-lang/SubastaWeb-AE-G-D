@@ -1,8 +1,10 @@
 package com.subastaweb.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.subastaweb.domain.Category;
 import com.subastaweb.domain.Role;
 import com.subastaweb.domain.User;
+import com.subastaweb.persistence.AuctionImageRepository;
 import com.subastaweb.persistence.AuctionRepository;
 import com.subastaweb.persistence.CategoryRepository;
 import com.subastaweb.persistence.UserRepository;
@@ -58,14 +60,21 @@ abstract class IntegrationTestBase {
     @Autowired
     protected AuctionRepository auctions;
     @Autowired
+    protected AuctionImageRepository auctionImages;
+    @Autowired
     protected CategoryRepository categories;
     @Autowired
     protected PasswordEncoder encoder;
 
     @BeforeEach
     void cleanDatabaseAndUploads() throws IOException {
-        auctions.deleteAll();
-        users.deleteAll();
+        // Orden por llaves foráneas: imágenes -> subastas -> usuarios -> categorías (el borrado en lote es inmediato).
+        auctionImages.deleteAllInBatch();
+        auctions.deleteAllInBatch();
+        users.deleteAllInBatch();
+        categories.deleteAllInBatch();
+        categories.save(new Category("Arte", "arte", true));
+        categories.save(new Category("Hogar", "hogar", true));
         try (Stream<Path> files = Files.list(UPLOADS)) {
             for (Path file : files.toList()) {
                 Files.deleteIfExists(file);
