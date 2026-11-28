@@ -1,4 +1,10 @@
 package com.subastaweb.api;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
+import com.subastaweb.application.UpdateAuctionCommand;
+import com.subastaweb.api.dto.UpdateAuctionRequest;
 
 import com.subastaweb.api.dto.AuctionResponse;
 import com.subastaweb.api.dto.CreateAuctionForm;
@@ -50,5 +56,32 @@ public class AuctionController {
                 .map(AuctionResponse::from)
                 .toList();
         return ResponseEntity.ok(mine);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AuctionResponse> patch(@PathVariable Long id,
+                                                 @RequestBody UpdateAuctionRequest body,
+                                                 @AuthenticationPrincipal SessionUser user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Auction updated = auctionService.patchRejected(user.id(), id, new UpdateAuctionCommand(
+                body.title(),
+                body.description(),
+                body.categoryId(),
+                body.startingPrice(),
+                body.durationHours()));
+        return ResponseEntity.ok(AuctionResponse.from(updated));
+    }
+
+    @PostMapping("/{id}/resubmit")
+    public ResponseEntity<AuctionResponse> resubmit(@PathVariable Long id,
+                                                    @RequestParam(required = false) Integer contentVersion,
+                                                    @AuthenticationPrincipal SessionUser user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Auction resubmitted = auctionService.resubmit(user.id(), id, contentVersion);
+        return ResponseEntity.ok(AuctionResponse.from(resubmitted));
     }
 }

@@ -23,7 +23,7 @@ import org.hibernate.type.SqlTypes;
 
 /**
  * Subasta. Solo se mapean las columnas que usa el Sprint 1; el resto de columnas de la tabla
- * (min_increment, review_round, fechas de aprobación, etc.) tienen valor por defecto en la base de datos.
+ * (min_increment, review_round, fechas de aprobaciÃ³n, etc.) tienen valor por defecto en la base de datos.
  */
 @Entity
 @Table(name = "auctions")
@@ -84,7 +84,7 @@ public class Auction {
 
     /**
      * Constructor de compatibilidad: crea la subasta y su imagen a partir del nombre del archivo.
-     * Lo conserva para código y pruebas que ya lo usaban (el tamaño real se registra con addImage).
+     * Lo conserva para cÃ³digo y pruebas que ya lo usaban (el tamaÃ±o real se registra con addImage).
      */
     public Auction(User seller, Category category, String title, String description,
                    long startingPrice, int durationHours, String imagePath, AuctionStatus status) {
@@ -151,5 +151,41 @@ public class Auction {
     /** Nombre del archivo de la primera imagen (null si no tiene). */
     public String getImagePath() {
         return images.isEmpty() ? null : images.get(0).getStorageKey();
+    }
+
+    @Column(name = "review_round", nullable = false)
+    private int reviewRound = 1;
+
+    @Column(name = "content_version", nullable = false)
+    private int contentVersion = 1;
+
+    @Column(name = "rejected_content_version", nullable = false)
+    private int rejectedContentVersion = 0;
+
+    public int getReviewRound() {
+        return reviewRound;
+    }
+
+    public int getContentVersion() {
+        return contentVersion;
+    }
+
+    public int getRejectedContentVersion() {
+        return rejectedContentVersion;
+    }
+
+    public void applyRejectedEdit(String title, String description, Category category,
+                                  long startingPrice, int durationHours) {
+        this.title = title;
+        this.description = description;
+        this.category = category;
+        this.startingPrice = startingPrice;
+        this.durationHours = durationHours;
+        this.contentVersion += 1;
+    }
+
+    public void markResubmitted() {
+        this.status = AuctionStatus.PENDIENTE_REVISION;
+        this.reviewRound += 1;
     }
 }

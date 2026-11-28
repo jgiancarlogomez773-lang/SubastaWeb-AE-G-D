@@ -1,4 +1,5 @@
 package com.subastaweb.application;
+import com.subastaweb.application.UpdateAuctionCommand;
 
 import com.subastaweb.domain.Auction;
 import com.subastaweb.domain.AuctionImage;
@@ -118,5 +119,74 @@ public class AuctionService {
                 }
             }
         });
+    }
+
+    @Transactional
+    public Auction patchRejected(Long actorId, Long auctionId, UpdateAuctionCommand cmd) {
+        if (actorId == null || !users.existsById(actorId)) {
+            throw new DomainException(ErrorCode.AUTH_REQUIRED, "Sesion no valida.");
+        }
+        Auction auction = auctions.findById(auctionId)
+                .orElseThrow(() -> new DomainException(ErrorCode.AUCTION_NOT_PUBLIC, "La subasta no existe."));
+
+        if (!auction.getSeller().getId().equals(actorId)) {
+            throw new DomainException(ErrorCode.FORBIDDEN, "No tienes permiso para editar esta subasta.");
+        }
+        if (auction.getStatus() != AuctionStatus.RECHAZADA) {
+            throw new DomainException(ErrorCode.AUCTION_CONFLICT,
+                    "Solo se pueden editar subastas en estado RECHAZADA.");
+        }
+
+        String nextTitle = cmd.title() != null ? cmd.title().trim() : auction.getTitle();
+        String nextDescription = cmd.description() != null ? cmd.description().trim() : auction.getDescription();
+        Long nextCategoryId = cmd.categoryId() != null ? cmd.categoryId() : auction.getCategory().getId();
+        long nextStartingPrice = cmd.startingPrice() != null ? cmd.startingPrice() : auction.getStartingPrice();
+        int nextDurationHours = cmd.durationHours() != null ? cmd.durationHours() : auction.getDurationHours();
+
+        validateFields(nextTitle, nextDescription, nextDurationHours);
+
+        Category nextCategory = categories.findByIdAndActiveTrue(nextCategoryId)
+                .orElseThrow(() -> new DomainException(ErrorCode.VALIDATION_ERROR,
+                        "Los datos enviados no son validos.",
+                        List.of(new FieldIssue("categoryId", "La categoria no existe o no esta disponible."))));
+
+        boolean changed = !nextTitle.equals(auction.getTitle())
+                || !nextDescription.equals(auction.getDescription())
+                || !nextCategory.getId().equals(auction.getCategory().getId())
+                || nextStartingPrice != auction.getStartingPrice()
+                || nextDurationHours != auction.getDurationHours();
+
+        if (changed) {
+            auction.applyRejectedEdit(nextTitle, nextDescription, nextCategory, nextStartingPrice, nextDurationHours);
+        }
+        return auctions.save(auction);
+    }
+
+    @Transactional
+    public Auction resubmit(Long actorId, Long auctionId, Integer expectedContentVersion) {
+        if (actorId == null || !users.existsById(actorId)) {
+            throw new DomainException(ErrorCode.AUTH_REQUIRED, "Sesion no valida.");
+        }
+        Auction auction = auctions.findById(auctionId)
+                .orElseThrow(() -> new DomainException(ErrorCode.AUCTION_NOT_PUBLIC, "La subasta no existe."));
+
+        if (!auction.getSeller().getId().equals(actorId)) {
+            throw new DomainException(ErrorCode.FORBIDDEN, "No tienes permiso para reenviar esta subasta.");
+        }
+        if (auction.getStatus() != AuctionStatus.RECHAZADA) {
+            throw new DomainException(ErrorCode.AUCTION_CONFLICT,
+                    "Solo se pueden reenviar subastas en estado RECHAZADA.");
+        }
+        if (expectedContentVersion != null && auction.getContentVersion() != expectedContentVersion) {
+            throw new DomainException(ErrorCode.AUCTION_CONFLICT,
+                    "La version de contenido esta desfasada.");
+        }
+        if (auction.getContentVersion() <= auction.getRejectedContentVersion()) {
+            throw new DomainException(ErrorCode.AUCTION_CONFLICT,
+                    "Debe realizar cambios antes de reenviar la subasta.");
+        }
+
+        auction.markResubmitted();
+        return auctions.save(auction);
     }
 }
