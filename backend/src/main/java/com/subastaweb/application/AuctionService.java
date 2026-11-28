@@ -41,14 +41,10 @@ public class AuctionService {
         this.storage = storage;
     }
 
-    /**
-     * HU-04: crea una solicitud privada (PENDIENTE_REVISION). Todo se valida antes de guardar nada y, si la
-     * transacción no termina bien, se borra la imagen: no queda persistencia parcial.
-     */
     @Transactional
     public Auction create(Long sellerId, CreateAuctionCommand cmd) {
         User seller = users.findById(sellerId)
-                .orElseThrow(() -> new DomainException(ErrorCode.AUTH_REQUIRED, "Sesión no válida."));
+                .orElseThrow(() -> new DomainException(ErrorCode.AUTH_REQUIRED, "Sesion no valida."));
 
         String title = cmd.title() == null ? "" : cmd.title().trim();
         String description = cmd.description() == null ? "" : cmd.description().trim();
@@ -58,8 +54,8 @@ public class AuctionService {
 
         Category category = categories.findByIdAndActiveTrue(cmd.categoryId())
                 .orElseThrow(() -> new DomainException(ErrorCode.VALIDATION_ERROR,
-                        "Los datos enviados no son válidos.",
-                        List.of(new FieldIssue("categoryId", "La categoría no existe o no está disponible."))));
+                        "Los datos enviados no son validos.",
+                        List.of(new FieldIssue("categoryId", "La categoria no existe o no esta disponible."))));
 
         String storedName = storage.store(cmd.image(), imageType.extension());
         deleteImageUnlessCommitted(storedName);
@@ -70,20 +66,27 @@ public class AuctionService {
         return auctions.save(auction);
     }
 
-    /** Reglas que la base de datos también exige (se miden sobre el texto sin espacios sobrantes). */
+    @Transactional(readOnly = true)
+    public List<Auction> findMine(Long sellerId) {
+        if (sellerId == null || !users.existsById(sellerId)) {
+            throw new DomainException(ErrorCode.AUTH_REQUIRED, "Sesion no valida.");
+        }
+        return auctions.findBySeller_IdOrderByCreatedAtDesc(sellerId);
+    }
+
     private void validateFields(String title, String description, int durationHours) {
         List<FieldIssue> issues = new ArrayList<>();
         if (title.length() < TITLE_MIN || title.length() > TITLE_MAX) {
-            issues.add(new FieldIssue("title", "El título debe tener entre 5 y 120 caracteres."));
+            issues.add(new FieldIssue("title", "El titulo debe tener entre 5 y 120 caracteres."));
         }
         if (description.length() < DESCRIPTION_MIN || description.length() > DESCRIPTION_MAX) {
-            issues.add(new FieldIssue("description", "La descripción debe tener entre 20 y 2000 caracteres."));
+            issues.add(new FieldIssue("description", "La descripcion debe tener entre 20 y 2000 caracteres."));
         }
         if (!AuctionRules.isAllowedDuration(durationHours)) {
-            issues.add(new FieldIssue("durationHours", "La duración debe ser de 24, 48 o 72 horas."));
+            issues.add(new FieldIssue("durationHours", "La duracion debe ser de 24, 48 o 72 horas."));
         }
         if (!issues.isEmpty()) {
-            throw new DomainException(ErrorCode.VALIDATION_ERROR, "Los datos enviados no son válidos.", issues);
+            throw new DomainException(ErrorCode.VALIDATION_ERROR, "Los datos enviados no son validos.", issues);
         }
     }
 
@@ -92,14 +95,14 @@ public class AuctionService {
             throw invalidImage("Debes adjuntar una imagen.");
         }
         if (image.length > AuctionRules.MAX_IMAGE_BYTES) {
-            throw invalidImage("La imagen supera el máximo de 3 MB.");
+            throw invalidImage("La imagen supera el maximo de 3 MB.");
         }
         return ImageType.detect(image)
                 .orElseThrow(() -> invalidImage("La imagen debe ser JPG, PNG o WebP."));
     }
 
     private static DomainException invalidImage(String message) {
-        return new DomainException(ErrorCode.INVALID_IMAGE, "La imagen no es válida.",
+        return new DomainException(ErrorCode.INVALID_IMAGE, "La imagen no es valida.",
                 List.of(new FieldIssue("image", message)));
     }
 
